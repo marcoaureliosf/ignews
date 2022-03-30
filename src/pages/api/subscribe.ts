@@ -17,7 +17,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
     const session: any = await getSession({ req })
 
-    const user: any = await fauna.query(
+    const user: User = await fauna.query(
       q.Get(
         q.Match(
           q.Index('user_by_email'),
