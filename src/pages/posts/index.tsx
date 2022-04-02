@@ -6,6 +6,7 @@ import { RichText } from 'prismic-dom'
 import { getPrismicClient } from '../../services/prismic'
 
 import styles from './styles.module.scss'
+import Link from 'next/link'
 
 type Post = {
   slug: string
@@ -28,11 +29,13 @@ function Posts({ posts }: PostsProps) {
     <main className={styles.container}>
       <div className={styles.posts}>
         {posts.map(post => (
-          <a key={post.slug} href="#">
-            <time>{post.updatedAt}</time>
-            <strong>{post.title}</strong>
-            <p>{post.excerpt}</p>
-          </a>
+          <Link href={`/posts/${post.slug}`}>
+            <a key={post.slug}>
+              <time>{post.updatedAt}</time>
+              <strong>{post.title}</strong>
+              <p>{post.excerpt}</p>
+            </a>
+          </Link>
         ))}
       </div>
     </main>
@@ -46,18 +49,18 @@ export default Posts
 export const getStaticProps: GetStaticProps = async () => {
   const prismic = getPrismicClient()
 
-  const response = await prismic.query([]
+  const response = await prismic.query([
     Prismic.predicate.at('document.type', 'post')
   ], {
     fetch: ['post.title', 'post.content'],
     pageSize: 100
   })
 
-  const posts = response.results.map(post => {
+  const posts = response.results.map((post: any) => {
     return {
       slug: post.uid,
       title: RichText.asText(post.data.title),
-      excerpt: post.data.content.find(content => content.type === 'paragraph')?.text ?? '',
+      excerpt: post.data.content.find((content: any) => content.type === 'paragraph')?.text ?? '',
       updatedAt: new Date(post.last_post_data).toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: 'long',
